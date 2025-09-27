@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Flores - animación</title>
+    <style>
+        :root {
+            --flowerGrowDuration: 1000ms;
+            --fillDuration: 10000ms;
+            --messageTimes: 10000, 12000, 14000;
+            --textColor: #fff;
+            --textSize: 1.2rem;
+            --boxPadding: 12px 18px;
+            --glowIntensity: 0.6;
+            --wordRainDuration: 5000ms; 
+            --wordRainInterval: 200ms;
+            --wordColor: #00bcd4;  /* VARIABLE: Color de la palabra "mucho" */
+            --wordSize: 3rem;
+        }
+
+        html, body { height: 100%; margin: 0; }
+        body {
+            overflow: hidden;
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(180deg,#2e8b57 0%, #3cb371 100%),
+                        repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 6px, transparent 6px 12px),
+                        repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 6px, transparent 6px 12px);
+            background-blend-mode: multiply;
+            background-size: cover;
+            position: relative;
+        }
+
+        .flower {
+            position: absolute;
+            transform-origin: center center;
+            transform: scale(0);
+            animation: grow var(--flowerGrowDuration) forwards;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        @keyframes grow { to { transform: scale(1); } }
+
+        .petal {
+            position: absolute;
+            transform-origin: center center;
+            box-shadow: 0 0 calc(15px * var(--glowIntensity)) rgba(255, 255, 0, 0.6);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+
+        .center {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 0 calc(20px * var(--glowIntensity)) rgba(255, 0, 0, 0.7);
+        }
+
+        .mensaje {
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            z-index: 99999;
+            padding: var(--boxPadding);
+            border-radius: 12px;
+            color: var(--textColor);
+            font-weight: 700;
+            text-align: center;
+            font-size: var(--textSize);
+            pointer-events: none;
+            /* VARIABLE: Color del recuadro (fondo) de las frases */
+            background: rgba(0,0,0,0.4); 
+            text-shadow: 0 0 15px orange, 0 0 30px yellow;
+        }
+
+        .mensaje.show {
+            animation: fadeIn 1.2s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%) scale(0.95); }
+            to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        #mensaje1 { top: 15%; }
+        #mensaje2 { top: 50%; }
+        #mensaje3 { top: 85%; }
+
+        .word-rain {
+            position: absolute;
+            font-size: var(--wordSize);
+            color: var(--wordColor);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,255,255,0.7);
+            white-space: nowrap;
+            animation: fall var(--wordRainDuration) linear forwards;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-50px) translateX(0) rotateZ(0deg); opacity: 0; }
+            20%  { opacity: 1; }
+            80%  { opacity: 1; }
+            to   { transform: translateY(100vh) translateX(var(--fallEndTranslateX)) rotateZ(var(--fallEndRotateZ)); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mensaje1" class="mensaje">te quiero</div>
+    <div id="mensaje2" class="mensaje">machapa</div>
+    <div id="mensaje3" class="mensaje">mereces esto y más</div>
+
+    <script>
+        const minSize = 80;
+        const maxSize = 180;
+        const tonosAmarillos = ['#fff44f', '#ffd700', '#ffea00', '#f4c700', '#ffeb3b', '#ffc107'];
+        const tonosCentros = ['#ff6b6b', '#b20000', '#ff0000', '#cc0000'];
+
+        function createFlower(pos) {
+            const size = Math.random() * (maxSize - minSize) + minSize;
+            const flower = document.createElement('div');
+            flower.className = 'flower';
+            flower.style.width = size + 'px';
+            flower.style.height = size + 'px';
+            flower.style.left = (pos.x - size / 2) + 'px';
+            flower.style.top = (pos.y - size / 2) + 'px';
+
+            const randomRotation = Math.random() * 360; 
+            flower.style.transform = `scale(0) rotate(${randomRotation}deg)`; 
+
+            const petalW = size * 0.55;
+            const petalH = size * 0.7;
+
+            for (let i = 0; i < 6; i++) {
+                const p = document.createElement('div');
+                p.className = 'petal';
+                p.style.width = petalW + 'px';
+                p.style.height = petalH + 'px';
+                p.style.left = (size - petalW) / 2 + 'px';
+                p.style.top = (size - petalH) / 2 + 'px';
+                p.style.background = tonosAmarillos[i % 2]; 
+                p.style.transform = `rotate(${i * 60}deg) translateY(-${petalH * 0.3}px)`;
+                flower.appendChild(p);
+            }
+
+            const centro = document.createElement('div');
+            centro.className = 'center';
+            const centroSize = size * 0.33;
+            centro.style.width = centroSize + 'px';
+            centro.style.height = centroSize + 'px';
+            centro.style.left = (size - centroSize) / 2 + 'px';
+            centro.style.top = (size - centroSize) / 2 + 'px';
+            centro.style.background = 'radial-gradient(circle at 35% 35%, #ff6b6b, #b20000)';
+            flower.appendChild(centro);
+
+            document.body.appendChild(flower);
+        }
+        
+        function startWordRain() {
+            const wordToRain = "mucho";
+            const numWords = 30; 
+            const rainInterval = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--wordRainInterval'));
+            const rainDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--wordRainDuration'));
+
+            let wordsCreated = 0;
+            const rainTimer = setInterval(() => {
+                if (wordsCreated >= numWords) {
+                    clearInterval(rainTimer);
+                    return;
+                }
+
+                const wordDiv = document.createElement('div');
+                wordDiv.className = 'word-rain';
+                wordDiv.textContent = wordToRain;
+
+                const startX = Math.random() * (window.innerWidth - 100); 
+                wordDiv.style.left = startX + 'px';
+
+                wordDiv.style.setProperty('--fallEndTranslateX', `${(Math.random() - 0.5) * 100}px`);
+                wordDiv.style.setProperty('--fallEndRotateZ', `${(Math.random() - 0.5) * 720}deg`);
+
+                document.body.appendChild(wordDiv);
+
+                setTimeout(() => {
+                    wordDiv.remove();
+                }, rainDuration + 100);
+
+                wordsCreated++;
+            }, rainInterval);
+        }
+
+        function startAnimation() {
+            const avgSize = (minSize + maxSize) / 2;
+            const cell = Math.max(48, Math.round(avgSize * 0.9));
+            const densityFactor = 0.7;
+            const paddingFactor = 1.2;
+
+            let cols = Math.floor((window.innerWidth * paddingFactor) / (cell * densityFactor)) || 1;
+            let rows = Math.floor((window.innerHeight * paddingFactor) / (cell * densityFactor)) || 1;
+
+            const positions = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const jitterX = (Math.random() - 0.5) * cell * 0.4;
+                    const jitterY = (Math.random() - 0.5) * cell * 0.4;
+                    
+                    const x = (c * cell * densityFactor) - (window.innerWidth * (paddingFactor - 1) / 2) + (cell * densityFactor) / 2 + jitterX;
+                    const y = (r * cell * densityFactor) - (window.innerHeight * (paddingFactor - 1) / 2) + (cell * densityFactor) / 2 + jitterY;
+                    positions.push({ x, y });
+                }
+            }
+
+            for (let i = positions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [positions[i], positions[j]] = [positions[j], positions[i]];
+            }
+
+            const totalFlowers = positions.length;
+            const fillDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--fillDuration'));
+            const interval = Math.max(5, fillDuration / totalFlowers);
+
+            let created = 0;
+            const timer = setInterval(() => {
+                if (created >= totalFlowers) { 
+                    clearInterval(timer); 
+                    // VARIABLE: Tiempo de inicio de la lluvia
+                    setTimeout(startWordRain, 500); 
+                    return; 
+                }
+                createFlower(positions[created]);
+                created++;
+            }, interval);
+
+            const messageTimes = getComputedStyle(document.documentElement).getPropertyValue('--messageTimes').split(',').map(t => parseInt(t.trim()));
+            const mensajes = [
+                document.getElementById('mensaje1'),
+                document.getElementById('mensaje2'),
+                document.getElementById('mensaje3')
+            ];
+
+            messageTimes.forEach((t, i) => {
+                setTimeout(() => { mensajes[i].classList.add('show'); }, t);
+            });
+        }
+
+        setTimeout(startAnimation, 2000);
+    </script>
+</body>
+</html>
