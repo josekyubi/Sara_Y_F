@@ -12,10 +12,10 @@
             --textColor: #fff;
             --textSize: 1.2rem;
             --boxPadding: 12px 18px;
-            --glowIntensity: 0.6;
-            --wordRainDuration: 5000ms; 
-            --wordRainInterval: 200ms;
-            --wordColor: #00bcd4;  /* VARIABLE: Color de la palabra "mucho" */
+            --glowIntensity: 0.9;
+            --wordRainDuration: 3000ms; 
+            --wordRainInterval: 300ms;
+            --wordColor: #53ca33;  /* VARIABLE: Color de la palabra "mucho" */
             --wordSize: 3rem;
         }
 
@@ -64,12 +64,12 @@
             padding: var(--boxPadding);
             border-radius: 12px;
             color: var(--textColor);
-            font-weight: 700;
+            font-weight: 1000;
             text-align: center;
             font-size: var(--textSize);
             pointer-events: none;
             /* VARIABLE: Color del recuadro (fondo) de las frases */
-            background: rgba(0,0,0,0.4); 
+            background: rgba(39, 223, 48, 0.767); 
             text-shadow: 0 0 15px orange, 0 0 30px yellow;
         }
 
@@ -107,13 +107,13 @@
     </style>
 </head>
 <body>
-    <div id="mensaje1" class="mensaje">te quiero</div>
-    <div id="mensaje2" class="mensaje">machapa</div>
-    <div id="mensaje3" class="mensaje">mereces esto y más</div>
+    <div id="mensaje1" class="mensaje">Mereces esto y más, corazon de melón</div>
+    <div id="mensaje2" class="mensaje">Te quiero</div>
+    <div id="mensaje3" class="mensaje">Mucho</div>
 
     <script>
-        const minSize = 80;
-        const maxSize = 180;
+        const minSize = 60;
+        const maxSize = 150;
         const tonosAmarillos = ['#fff44f', '#ffd700', '#ffea00', '#f4c700', '#ffeb3b', '#ffc107'];
         const tonosCentros = ['#ff6b6b', '#b20000', '#ff0000', '#cc0000'];
 
@@ -159,7 +159,7 @@
         
         function startWordRain() {
             const wordToRain = "mucho";
-            const numWords = 30; 
+            const numWords = 400; 
             const rainInterval = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--wordRainInterval'));
             const rainDuration = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--wordRainDuration'));
 
@@ -184,7 +184,7 @@
 
                 setTimeout(() => {
                     wordDiv.remove();
-                }, rainDuration + 100);
+                }, rainDuration + 200);
 
                 wordsCreated++;
             }, rainInterval);
@@ -193,8 +193,8 @@
         function startAnimation() {
             const avgSize = (minSize + maxSize) / 2;
             const cell = Math.max(48, Math.round(avgSize * 0.9));
-            const densityFactor = 0.7;
-            const paddingFactor = 1.2;
+            const densityFactor = 0.65;
+            const paddingFactor = 1.4;
 
             let cols = Math.floor((window.innerWidth * paddingFactor) / (cell * densityFactor)) || 1;
             let rows = Math.floor((window.innerHeight * paddingFactor) / (cell * densityFactor)) || 1;
@@ -225,7 +225,7 @@
                 if (created >= totalFlowers) { 
                     clearInterval(timer); 
                     // VARIABLE: Tiempo de inicio de la lluvia
-                    setTimeout(startWordRain, 500); 
+                    setTimeout(startWordRain, 5000);   // Inicio de lluvia
                     return; 
                 }
                 createFlower(positions[created]);
@@ -244,7 +244,7 @@
             });
         }
 
-        setTimeout(startAnimation, 2000);
+        setTimeout(startAnimation, 700);  //Inicio de animación 
     </script>
 </body>
 </html>
